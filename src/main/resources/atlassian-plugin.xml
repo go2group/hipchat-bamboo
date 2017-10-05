@@ -1,0 +1,70 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="configure.url">/admin/viewConfigureHipchatPlugin.action</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="HipChat4Bamboo"/> 
+    
+    <!-- add our web resources -->
+    <web-resource key="HipChat4Bamboo-resources" name="HipChat4Bamboo Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        
+        <resource type="download" name="HipChat4Bamboo.css" location="/css/HipChat4Bamboo.css"/>
+        <resource type="download" name="HipChat4Bamboo.js" location="/js/HipChat4Bamboo.js"/>
+        <resource type="download" name="images/" location="/images"/>
+
+        <context>HipChat4Bamboo</context>
+    </web-resource>
+    
+    <!-- import from the product container -->
+    <component-import key="requestFactory" interface="com.atlassian.sal.api.net.RequestFactory"/>
+    <component-import key="executorFactory" interface="com.atlassian.sal.api.executor.ThreadLocalDelegateExecutorFactory"/>
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+    
+    <component name="HipChat Proxy Client" key="proxy-client"
+               class="com.go2group.hipchat.components.HipChatProxyClient"/>
+    
+    <notificationRecipient key="hichat.recipient" name="Hipchat Recipient"
+                       class="com.go2group.recipients.HipchatRecipient" weight="100">
+    	<description>Hipchat Rooms</description>
+    	<resource type="freemarker" name="edit" location="templates/notifications/hipchatRecipientEdit.ftl"/>
+    	<resource type="freemarker" name="view" location="templates/notifications/hipchatRecipientView.ftl"/>
+  	</notificationRecipient>
+  	
+  	<xwork key="hipchat-admin.action" name="Hipchat Configuration Action">
+      <package name="hipchatPlugin" extends="admin">
+        <action name="viewConfigureHipchatPlugin" class="com.go2group.actions.HipChatConfigurationPlugin" method="input">
+          <result name="input" type="freemarker">/templates/admin/configureHipchat.ftl</result>
+        </action>
+        <action name="updateConfigureHipchatPlugin" class="com.go2group.actions.HipChatConfigurationPlugin" method="execute">
+          <result name="input" type="freemarker">/templates/admin/configureHipchat.ftl</result>
+          <result name="error" type="freemarker">/templates/admin/configureHipchat.ftl</result>
+          <result name="success" type="freemarker">/templates/admin/configureHipchat.ftl</result>
+        </action>
+      </package>
+    </xwork>
+    
+    <xwork key="hipchat-announcement.action" name="Hipchat Announcements">
+      <package name="hipchatAnnouncements" extends="admin">
+        <action name="viewAnnouncements" class="com.go2group.actions.Announcements" method="input">
+          <result name="input" type="freemarker">/templates/admin/announcements.ftl</result>
+        </action>
+        <action name="postAnnouncements" class="com.go2group.actions.Announcements" method="execute">
+          <result name="input" type="freemarker">/templates/admin/announcements.ftl</result>
+          <result name="error" type="freemarker">/templates/admin/announcements.ftl</result>
+          <result name="success" type="freemarker">/templates/admin/announcements.ftl</result>
+        </action>
+      </package>
+    </xwork>
+
+    <web-item key="hipchat-admin.item" name="Hipchat Configuration" section="system.admin/plugins">
+      <label key="hipchat-admin.label"/>
+      <link linkId="hipchat-admin.link">/admin/viewConfigureHipchatPlugin.action</link>
+    </web-item>
+
+    
+</atlassian-plugin>
